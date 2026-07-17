@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { dummyBookingData } from "../assets/assets";
 import Loading from "../components/Loading";
 import BlurCircle from "../components/BlurCircle";
 import timeFormat from "../lib/timeFormat";
 import { dateFormat } from "../lib/dateFormat";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const MyBookings = () => {
   const currency = import.meta.env.VITE_CURRENCY;
-
   const { axios, getToken, user, image_base_url } = useAppContext();
+  const navigate = useNavigate();
 
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,44 +36,14 @@ const MyBookings = () => {
     setIsLoading(false);
   };
 
-  const confirmPayment = async (bookingId) => {
-    try {
-      const { data } = await axios.post(
-        "/api/user/confirm-payment",
-        {
-          bookingId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${await getToken()}`,
-          },
-        }
-      );
-
-      if (data.success) {
-        toast.success(data.message);
-
-        getMyBookings();
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Payment Failed");
-    }
-  };
-
-
   useEffect(() => {
     if (user) {
       getMyBookings();
     }
   }, [user]);
 
-
   return !isLoading ? (
     <div className="relative px-6 md:px-16 lg:px-40 pt-30 md:pt-40 min-h-[80vh]">
-
       <BlurCircle top="100px" left="100px" />
 
       <div>
@@ -82,114 +52,87 @@ const MyBookings = () => {
 
       <h1 className="text-lg font-semibold mb-4">My Bookings</h1>
 
-
       {bookings.map((item, index) => (
         <div
           key={index}
           className="flex flex-col md:flex-row justify-between bg-primary/8 border border-primary/20 rounded-lg mt-4 p-2 max-w-3xl"
         >
-
           <div className="flex flex-col md:flex-row">
-
             <img
               src={image_base_url + item.show.movie.poster_path}
               alt={item.show.movie.title}
               className="md:max-w-45 aspect-video h-auto object-cover object-bottom rounded"
             />
 
-
             <div className="flex flex-col p-4">
-
               <p className="text-lg font-semibold">
                 {item.show.movie.title}
               </p>
-
 
               <p className="text-gray-400 text-sm">
                 {timeFormat(item.show.movie.runtime)}
               </p>
 
-
               <p className="text-gray-400 text-sm mt-auto">
                 {dateFormat(item.show.showDateTime)}
               </p>
-
             </div>
-
           </div>
 
-
-
           <div className="flex flex-col md:items-end md:text-right justify-between p-4">
-
             <div className="flex items-center gap-4">
-
               <p className="text-2xl font-semibold mb-3">
                 {currency}
                 {item.amount}
               </p>
 
-
               {item.status === "cancelled" ? (
-
                 <button
                   disabled
                   className="bg-red-600 text-white px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-default"
                 >
                   Cancelled
                 </button>
-
               ) : !item.ispaid ? (
-
                 <button
-                  onClick={() => confirmPayment(item._id)}
+                  onClick={() =>
+                    navigate(`/payment/${item._id}`, {
+                      state: {
+                        amount: item.amount,
+                      },
+                    })
+                  }
                   className="bg-primary px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-pointer hover:bg-primary/90 transition"
                 >
                   Pay Now
                 </button>
-
               ) : (
-
                 <button
                   disabled
                   className="bg-green-600 text-white px-4 py-1.5 mb-3 text-sm rounded-full font-medium cursor-default"
                 >
                   Confirmed
                 </button>
-
               )}
-
             </div>
 
-           <div className="text-sm">
-
+            <div className="text-sm">
               <p>
                 <span className="text-gray-400">Total Tickets:</span>{" "}
                 {item.bookedSeats.length}
               </p>
 
-
               <p>
                 <span className="text-gray-400">Seat Number:</span>{" "}
                 {item.bookedSeats.join(", ")}
               </p>
-
-
             </div>
-
           </div>
-
-
         </div>
       ))}
-
-
     </div>
-
   ) : (
-
     <Loading />
-
   );
 };
 

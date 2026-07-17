@@ -9,6 +9,7 @@ import showRouter from "./routes/showRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 import userRouter from "./routes/userRoutes.js";
+import { checkExpiredBookings } from "./utils/bookingExpiry.js";
 
 const app = express();
 const port = 3000;
@@ -22,6 +23,7 @@ app.use(clerkMiddleware());
 app.get("/", (req, res) => {
   res.send("Server is Live!");
 });
+
 app.use(
   "/api/inngest",
   serve({
@@ -35,6 +37,11 @@ app.use("/api/show", showRouter);
 app.use("/api/booking", bookingRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/user", userRouter);
+
+
+setInterval(() => {
+  checkExpiredBookings();
+}, 60 * 1000);
 
 
 app.listen(port, () => {
