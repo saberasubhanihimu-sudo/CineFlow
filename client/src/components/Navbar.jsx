@@ -51,29 +51,7 @@ const Navbar = () => {
           Movies
         </Link>
 
-        <Link
-          to="/"
-          className="hover:bg-white/10 px-4 py-2 rounded-full transition"
-          onClick={() => {
-            window.scrollTo(0, 0);
-            setIsOpen(false);
-          }}
-        >
-          Theaters
-        </Link>
-
-        <Link
-          to="/"
-          className="hover:bg-white/10 px-4 py-2 rounded-full transition"
-          onClick={() => {
-            window.scrollTo(0, 0);
-            setIsOpen(false);
-          }}
-        >
-          Releases
-        </Link>
-
-        {favoriteMovies.length > 0 && <Link
+         {favoriteMovies.length > 0 && <Link
           to="/favorite"
           className="hover:bg-white/10 px-4 py-2 rounded-full transition"
           onClick={() => {
