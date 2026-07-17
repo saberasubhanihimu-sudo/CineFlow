@@ -24,8 +24,7 @@ const TrailersSection = () => {
           />
         </div>
       </div>
-
-      {/* Trailer Thumbnails */}
+      
       <div className="max-w-[960px] mx-auto mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
         {dummyTrailers.map((trailer, index) => (
           <img
